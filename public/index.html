@@ -3,6 +3,14 @@
   <body>
     <h1>Report an Issue</h1>
     <form action="/api/v1/reports" method="post" enctype="multipart/form-data">
+      <label for="type">Report Type:</label><br>
+      <select name="type" id="type" required>
+        <option value="">Select type</option>
+        <option value="pest">Pest</option>
+        <option value="disease">Disease</option>
+        <option value="crop_health">Crop Health</option>
+      </select><br><br>
+
       <label>Description:</label><br>
       <input type="text" name="description"><br><br>
 
@@ -12,8 +20,12 @@
       <label>Video:</label><br>
       <input type="file" name="video"><br><br>
 
+      <label>Audio:</label><br>
+      <input type="file" name="audio"><br><br>
+
       <button type="submit">Submit</button>
     </form>
+
   </body>
 </html>
 
