@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+
+volumes:
+  mysql-data:
+

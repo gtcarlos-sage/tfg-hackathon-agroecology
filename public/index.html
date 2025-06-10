@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Report an Issue</h1>
+    <form action="/api/v1/reports" method="post" enctype="multipart/form-data">
+      <label>Description:</label><br>
+      <input type="text" name="description"><br><br>
+
+      <label>Photo:</label><br>
+      <input type="file" name="photo"><br><br>
+
+      <label>Video:</label><br>
+      <input type="file" name="video"><br><br>
+
+      <button type="submit">Submit</button>
+    </form>
+  </body>
+</html>
+
