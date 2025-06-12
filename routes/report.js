@@ -148,7 +148,7 @@ router.post(
   }
 );
 
-// http://localhost:3000/api/v1/reports/getAll
+// http://localhost:3000/api/v1/getAll
 router.get("/getAll", async (req, res) => {
   try {
     const [rows] = await db.execute("SELECT * FROM reports");
@@ -159,23 +159,28 @@ router.get("/getAll", async (req, res) => {
   }
 });
 
-// http://localhost:3000/api/v1/reports?type={type}
+// http://localhost:3000/api/v1/reports?type=pest
+// http://localhost:3000/api/v1/reports?id=1
 router.get("/reports", async (req, res) => {
-  const type = req.query.type;
-  console.log("Type query parameter:", req);
-
-  if (!type) {
-    return res.status(400).json({ error: "Type query parameter is required." });
-  }
+  const { type, id } = req.query;
 
   try {
-    const [rows] = await db.execute("SELECT * FROM reports WHERE type = ?", [
-      type,
-    ]);
+    let query = "SELECT * FROM reports";
+    let params = [];
+
+    if (type) {
+      query += " WHERE type = ?";
+      params.push(type);
+    } else if (id) {
+      query += " WHERE id = ?";
+      params.push(id);
+    }
+
+    const [rows] = await db.execute(query, params);
     res.json(rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to fetch reports by type." });
+    res.status(500).json({ error: "Failed to fetch reports." });
   }
 });
 
