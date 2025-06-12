@@ -148,13 +148,34 @@ router.post(
   }
 );
 
-router.get("/all", async (req, res) => {
+// http://localhost:3000/api/v1/reports/getAll
+router.get("/getAll", async (req, res) => {
   try {
     const [rows] = await db.execute("SELECT * FROM reports");
     res.json(rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch reports." });
+  }
+});
+
+// http://localhost:3000/api/v1/reports?type={type}
+router.get("/reports", async (req, res) => {
+  const type = req.query.type;
+  console.log("Type query parameter:", req);
+
+  if (!type) {
+    return res.status(400).json({ error: "Type query parameter is required." });
+  }
+
+  try {
+    const [rows] = await db.execute("SELECT * FROM reports WHERE type = ?", [
+      type,
+    ]);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch reports by type." });
   }
 });
 
