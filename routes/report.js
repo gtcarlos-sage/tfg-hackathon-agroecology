@@ -31,9 +31,9 @@ router.post(
     const video = req.files["video"]?.[0];
     const audio = req.files["audio"]?.[0];
 
-    let photoUrl = null;
-    let videoUrl = null;
-    let audioUrl = null;
+    let photoFileName = null;
+    let videoFileName = null;
+    let audioFileName = null;
 
     // Helper function to save file and return its path
     const saveFile = (file, folder, timestamp) => {
@@ -61,21 +61,19 @@ router.post(
 
       saveFile(file, folder, startTime); //Make sure the file exists on the server.
 
-      // Destination bucket
-      const bucket = "reports";
+      const bucket = process.env.MINIO_BUCKET || "reports";
 
       // Destination object name
-      const destinationObject = file;
       const fileName = `${startTime}_${file.originalname}`;
 
       // Check if the bucket exists
       // If it doesn't, create it
       const exists = await minioClient.bucketExists(bucket);
       if (exists) {
-        console.log("Bucket " + bucket + " exists.");
+        console.log(`Bucket ${bucket} exists.`);
       } else {
         await minioClient.makeBucket(bucket, "us-east-1");
-        console.log("Bucket " + bucket + ' created in "us-east-1".');
+        console.log(`Bucket ${bucket} created in "us-east-1.`);
       }
 
       // Set the object metadata
@@ -94,51 +92,45 @@ router.post(
         path.join(__dirname, `/uploads/${folder}/${fileName}`),
         metaData
       );
-      console.log(
-        "File " +
-          file.originalname +
-          " uploaded as object " +
-          destinationObject +
-          " in bucket " +
-          bucket
-      );
+      console.log(`File ${fileName} uploaded successfully to bucket ${bucket}`);
 
-      const expiry = 24 * 60 * 60; // seconds //todo never expired
-      const url = await minioClient.presignedGetObject(
-        bucket,
-        fileName,
-        expiry
-      );
+      // You can get the object from minIO bucket
+      // const res = await minioClient.getObject(bucket, fileName);
 
-      return url;
+      return fileName;
     };
 
     try {
       if (photo) {
-        photoUrl = await saveFileToBucket(photo, "photos");
+        photoFileName = await saveFileToBucket(photo, "photos");
       }
 
       if (video) {
-        videoUrl = await saveFileToBucket(video, "videos");
+        videoFileName = await saveFileToBucket(video, "videos");
       }
 
       if (audio) {
-        audioUrl = await saveFileToBucket(audio, "audio");
+        audioFileName = await saveFileToBucket(audio, "audio");
       }
 
       // Save report in DB
       await db.execute(
-        "INSERT INTO reports (type, description, photo_url, video_url, audio_url) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO reports (type, description, photo_filename, video_filename, audio_filename) VALUES (?, ?, ?, ?, ?)",
         [
           type,
           description ?? null,
-          photoUrl ?? null,
-          videoUrl ?? null,
-          audioUrl ?? null,
+          photoFileName ?? null,
+          videoFileName ?? null,
+          audioFileName ?? null,
         ]
       );
 
-      res.json({ message: "Report created", photoUrl, videoUrl, audioUrl });
+      res.json({
+        message: "Report created",
+        photoFilename: photoFileName,
+        videoFilename: videoFileName,
+        audioFilename: audioFileName,
+      });
     } catch (err) {
       console.error(err);
       res
