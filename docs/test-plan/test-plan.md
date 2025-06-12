@@ -41,6 +41,13 @@ This test plan outlines the testing strategy for the Agroecology Reporting App, 
 - Image upload performance
 - Database query response times
 
+### Security Testing
+
+- SQL injection 
+- XSS prevention 
+- Login/logout functionality 
+- Password requirements 
+
 ## Test Environment Requirements
 
 - Windows development environment
@@ -73,4 +80,9 @@ This test plan outlines the testing strategy for the Agroecology Reporting App, 
 
 ## Testing Tools
 
-- TBC
+- OSWAP ZAP (security)
+- Jest (JavaScript unti tests)
+- Cyrprus (end-to-end testing)
+- React Testing Library (React components)
+- Postman (API testing)
+- Github Actions (automated test pipelines)
