@@ -148,4 +148,40 @@ router.post(
   }
 );
 
+// http://localhost:3000/api/v1/getAll
+router.get("/getAll", async (req, res) => {
+  try {
+    const [rows] = await db.execute("SELECT * FROM reports");
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch reports." });
+  }
+});
+
+// http://localhost:3000/api/v1/reports?type=pest
+// http://localhost:3000/api/v1/reports?id=1
+router.get("/reports", async (req, res) => {
+  const { type, id } = req.query;
+
+  try {
+    let query = "SELECT * FROM reports";
+    let params = [];
+
+    if (type) {
+      query += " WHERE type = ?";
+      params.push(type);
+    } else if (id) {
+      query += " WHERE id = ?";
+      params.push(id);
+    }
+
+    const [rows] = await db.execute(query, params);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch reports." });
+  }
+});
+
 module.exports = router;
