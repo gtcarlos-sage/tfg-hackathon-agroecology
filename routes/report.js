@@ -148,4 +148,14 @@ router.post(
   }
 );
 
+router.get("/all", async (req, res) => {
+  try {
+    const [rows] = await db.execute("SELECT * FROM reports");
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch reports." });
+  }
+});
+
 module.exports = router;
